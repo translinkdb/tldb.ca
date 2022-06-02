@@ -1,0 +1,33 @@
+.RoutePill {
+  border: 2px solid var(--translink-darkblue);
+  width: 3em;
+  text-align: center;
+  border-radius: 1em;
+  font-size: 0.9em;
+
+  &.limited {
+    border-style: dashed;
+  }
+
+  &.nightbus {
+    background: var(--translink-darkblue);
+    color: white;
+  }
+
+  &.rapidbus {
+    background: var(--rapidbus-green);
+    border-color: var(--rapidbus-green);
+    color: white;
+  }
+
+  &.b-line {
+    background: var(--bline-orange);
+    border-color: var(--bline-orange);
+    color: black;
+  }
+
+  &.school-special {
+    background: lightgrey;
+    border-color: lightgray;
+  }
+}

@@ -1,0 +1,40 @@
+.Navbar {
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+  width: 100%;
+  border-bottom: 5px var(--translink-darkblue) solid;
+
+  .logo-link {
+    text-decoration: none;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+
+    .logo {
+      width: 50px;
+      margin-right: 0.5em;
+    }
+
+    .logo-text {
+      font-size: 1.2sem;
+      font-weight: bold;
+    }
+  }
+
+  .navlinks {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-left: 3em;
+
+    .navlink {
+      font-size: 1.2em;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  }
+}

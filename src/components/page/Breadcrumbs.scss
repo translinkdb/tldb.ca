@@ -1,0 +1,9 @@
+.Breadcrumbs {
+  display: flex;
+  align-items: center;
+
+  .breadcrumb-divider {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
