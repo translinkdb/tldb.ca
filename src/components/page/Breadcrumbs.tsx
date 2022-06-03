@@ -24,9 +24,13 @@ export const Breadcrumbs: React.FunctionComponent<BreadcrumbsProps> = ({
 
         return (
           <>
-            <Link to={path}>{b.name}</Link>
+            <Link key={path} to={path}>
+              {b.name}
+            </Link>
             {idx < breadcrumbs.length - 1 && (
-              <span className="breadcrumb-divider">&gt;</span>
+              <span key={path + "-divider"} className="breadcrumb-divider">
+                &gt;
+              </span>
             )}
           </>
         );

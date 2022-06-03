@@ -6,6 +6,11 @@ import { expoClient } from "./lib/expo/client";
 import { HomePage } from "./pages/HomePage";
 import { RoutePage } from "./pages/routes/RoutePage";
 import { RoutesPage } from "./pages/routes/RoutesPages";
+import mapboxgl from "mapbox-gl";
+import { config } from "./config";
+import { MapPage } from "./pages/map/MapPage";
+
+mapboxgl.accessToken = config.mapboxToken;
 
 function App() {
   return (
@@ -16,8 +21,11 @@ function App() {
           <Routes>
             <Route path="/">
               <Route index element={<HomePage />} />
+
               <Route path="routes" element={<RoutesPage />} />
-              <Route path="routes/:routeNumber" element={<RoutePage />}></Route>
+              <Route path="routes/:routeNumber" element={<RoutePage />} />
+
+              <Route path="map" element={<MapPage />} />
             </Route>
           </Routes>
         </div>
