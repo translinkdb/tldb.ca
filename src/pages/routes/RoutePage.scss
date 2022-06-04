@@ -4,4 +4,64 @@
       margin: 0;
     }
   }
+
+  .route-title {
+    display: flex;
+    align-items: center;
+
+    .route-id {
+      margin-left: 1em;
+    }
+  }
+
+  .map-container {
+    height: 700px;
+    width: 700px;
+    border-radius: 1em;
+    overflow: hidden;
+    border: 2px var(--translink-darkblue) solid;
+  }
+
+  .patterns {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+
+    .pattern {
+      flex-shrink: 0;
+      font-size: 0.8em;
+      border: 1px var(--translink-darkblue) solid;
+      border-radius: 1em;
+      padding: 2px 10px;
+      margin: 5px;
+
+      &.selected {
+        background: var(--compass-blue);
+        color: white;
+
+        &:hover {
+          background: var(--translink-blue);
+        }
+      }
+
+      &:hover {
+        background: whitesmoke;
+        cursor: pointer;
+      }
+
+      &:active {
+        border-color: var(--compass-blue);
+      }
+    }
+
+    &::-webkit-scrollbar {
+      height: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #eaeef2;
+      border-radius: 2em;
+    }
+  }
 }

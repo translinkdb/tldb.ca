@@ -1,5 +1,9 @@
-export function getPaletteColor(palette: string[], index: number): string {
-  return palette[index % (palette.length - 1)];
+import { Route } from "../expo/structures/Route";
+
+export type Palette = string[];
+
+export function getPaletteColor(palette: Palette, index: number): string {
+  return palette[index % palette.length];
 }
 
 export const olivePalette = [
@@ -22,3 +26,15 @@ export const rainbowPalette = [
   "#577590",
   "#277da1",
 ];
+
+export const specialPalettes = {
+  rapidbus: ["#00b259"],
+  bline: ["#f78e1e"],
+};
+
+export function getPaletteForRoute(route: Route): Palette {
+  if (route.number.startsWith("R")) return specialPalettes.rapidbus;
+  if (route.number === "99") return specialPalettes.bline;
+
+  return ["#00355f"];
+}

@@ -12,6 +12,7 @@ export interface Pattern {
   name: string;
   headsign: string;
   shape: Shape;
+  tripCount: number;
 }
 
 export interface Shape {

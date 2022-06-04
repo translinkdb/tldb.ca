@@ -8,4 +8,12 @@
   .title {
     margin-bottom: 0.5em;
   }
+
+  .routes-search {
+    border-radius: 1em;
+    border: 2px var(--translink-darkblue) solid;
+    padding: 5px 10px;
+    font-size: 1 2em;
+    margin-bottom: 1em;
+  }
 }

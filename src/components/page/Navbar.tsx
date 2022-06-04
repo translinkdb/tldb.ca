@@ -30,8 +30,8 @@ export const Navbar: React.FunctionComponent<NavbarProps> = () => {
           Vehicles
         </Link>
 
-        <Link to="/about" className="navlink">
-          About
+        <Link to="/other" className="navlink">
+          Other
         </Link>
       </div>
     </div>
