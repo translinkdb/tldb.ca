@@ -2,11 +2,13 @@ import EventEmitter from "events";
 import { Map } from "mapbox-gl";
 import { MutableRefObject } from "react";
 import { BaseMapOptions, TLDBBaseMap } from "./BaseMap";
-import { BaseLayer } from "./layers/BaseLayer";
+import { TLDBLayer } from "./layers/base/BaseLayer";
+import { BaseSource } from "./sources/BaseSource";
 
 export interface MapOptions {
   base?: Omit<BaseMapOptions, "container">;
-  layers?: BaseLayer[];
+  layers?: TLDBLayer[];
+  sources?: BaseSource<any, any, any>[];
 }
 
 export class TLDBMap {
@@ -14,14 +16,14 @@ export class TLDBMap {
   private _ready = false;
   private emiter = new EventEmitter();
 
-  constructor(private options: MapOptions = {}) {}
+  constructor(protected options: MapOptions = {}) {}
 
   public apply(container: MutableRefObject<HTMLDivElement | null>) {
     this._base = new TLDBBaseMap({ container, ...this.options.base });
 
-    this._base.on("load", () => {
+    this._base.on("load", async () => {
       this._ready = true;
-      this.init();
+      await this.init();
     });
   }
 
@@ -37,6 +39,12 @@ export class TLDBMap {
     return this._ready;
   }
 
+  public getSource<DataT = any, VariablesT = any>(
+    name: string
+  ): BaseSource<any, DataT, VariablesT> | undefined {
+    return this.options.sources?.find((s) => s.id === name);
+  }
+
   public toggleLayerSolo(layerID: string) {
     for (const layer of this.layers) {
       if (layer.id === `tldb-${layerID}`) {
@@ -47,7 +55,7 @@ export class TLDBMap {
     }
   }
 
-  public addLayers(...layers: BaseLayer[]) {
+  public addLayers(...layers: TLDBLayer[]) {
     if (!this._ready) {
       if (!this.options.layers) this.options.layers = [];
 
@@ -55,6 +63,18 @@ export class TLDBMap {
     } else {
       for (const layer of layers) {
         layer.apply(this.base);
+      }
+    }
+  }
+
+  public addSources(...sources: BaseSource<any, any, any>[]) {
+    if (!this._ready) {
+      if (!this.options.sources) this.options.sources = [];
+
+      this.options.sources.push(...sources);
+    } else {
+      for (const source of sources) {
+        source.apply(this.base);
       }
     }
   }
@@ -73,7 +93,12 @@ export class TLDBMap {
     );
   }
 
-  private init() {
+  private async init() {
+    await Promise.all(
+      (this.options.sources || []).map((s) => s.init.bind(s)())
+    );
+
+    this.addSources(...(this.options.sources || []));
     this.addLayers(...(this.options.layers || []));
     this.emiter.emit("on");
   }

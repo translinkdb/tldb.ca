@@ -1,4 +1,3 @@
-import { gql, useQuery } from "@apollo/client";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { MapDisplay } from "../../components/mapping/TLDBMapDisplay";
@@ -6,57 +5,20 @@ import { Breadcrumbs } from "../../components/page/Breadcrumbs";
 import { Page } from "../../components/page/Page";
 import { RouteLineDisplay } from "../../components/routes/RouteLineDisplay";
 import { optionalClass } from "../../helpers/components";
-import {
-  coordinatesToLatLongArray,
-  getCenter,
-  getZoom,
-} from "../../helpers/map";
 import { Route } from "../../lib/expo/structures/Route";
-import { RouteLayer } from "../../lib/mapping/layers/RouteLayer";
-import { TLDBMap } from "../../lib/mapping/Map";
+import { RoutePageMap } from "../../lib/mapping/maps/RoutePageMap";
 import "./RoutePage.scss";
-
-const GET_ROUTE = gql`
-  query getRoutes($routeNumber: String!) {
-    route: routes(filters: { number: { exact: $routeNumber } }) {
-      id
-      name
-      number
-
-      patterns {
-        id
-        name
-        headsign
-        tripCount
-        shape {
-          points {
-            coordinates {
-              latitude
-              longitude
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 export const RoutePage: React.FunctionComponent = () => {
   const { routeNumber } = useParams();
   const location = useLocation();
 
-  const map = useRef<TLDBMap | null>(null);
+  const map = useRef<RoutePageMap | null>(null);
 
-  const [route, setRoute] = useState<Route | undefined>(undefined);
-  const [mapReady, setMapReady] = useState(false);
   const [selectedPattern, setSelectedPattern] = useState<string | undefined>(
     undefined
   );
-
-  const { loading, error, data } = useQuery<
-    { route: [Route] },
-    { routeNumber: string }
-  >(GET_ROUTE, { variables: { routeNumber: routeNumber! } });
+  const [route, setRoute] = useState<Route | undefined>(undefined);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -64,49 +26,22 @@ export const RoutePage: React.FunctionComponent = () => {
   }, [location]);
 
   useEffect(() => {
-    setRoute(data?.route[0]);
-
-    if (!data || !mapReady) return;
-
-    const allCoords =
-      data.route[0].patterns.flatMap((p) =>
-        p.shape.points.map((p) => p.coordinates)
-      ) || [];
-
-    const mapBase = map.current!.base;
-
-    const routeLayer = new RouteLayer(data.route[0]);
-
-    map.current?.addLayers(routeLayer);
-
-    mapBase.zoomTo(getZoom(allCoords));
-    mapBase.easeTo({
-      center: coordinatesToLatLongArray(getCenter(allCoords)),
-    });
-  }, [data, mapReady]);
-
-  useEffect(() => {
-    if (route && selectedPattern) {
-      map.current?.toggleLayerSolo(selectedPattern);
-    } else if (route && !selectedPattern) {
-      map.current?.makeAllLayersVisible();
-    }
-  }, [route, selectedPattern]);
+    map.current!.selectPattern(selectedPattern);
+  }, [selectedPattern]);
 
   if (!map.current) {
-    map.current = new TLDBMap();
-    map.current.onReady(() => setMapReady(true));
+    map.current = new RoutePageMap();
   }
+
+  map.current.onReady(async () => {
+    await map.current?.createLayers(routeNumber!);
+
+    setRoute(map.current?.route);
+  });
 
   return (
     <Page title={route?.number || "Route"} className="RoutePage">
-      {loading && <p>Loading...</p>}
-
-      {error && (
-        <p>
-          <>Error: {error}</>
-        </p>
-      )}
+      {!route && <p>Loading...</p>}
 
       {route && (
         <div>
@@ -148,11 +83,11 @@ export const RoutePage: React.FunctionComponent = () => {
                   </p>
                 ))}
             </div>
-
-            <MapDisplay map={map.current} />
           </div>
         </div>
       )}
+
+      <MapDisplay map={map.current} hidden={!route} />
     </Page>
   );
 };

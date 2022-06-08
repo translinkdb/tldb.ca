@@ -1,0 +1,12 @@
+button,
+a.button {
+  border: 2px var(--translink-darkblue) solid;
+  background: none;
+  padding: 5px 10px;
+  border-radius: 10px;
+
+  &:hover {
+    background-color: whitesmoke;
+    cursor: pointer;
+  }
+}

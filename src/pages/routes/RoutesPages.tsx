@@ -17,12 +17,12 @@ const ROUTES = gql`
 `;
 
 export const RoutesPage: React.FunctionComponent = () => {
-  const [keywords, setKeywords] = useState<string | undefined>(undefined);
+  const [keywords, setKeywords] = useState<string | null>(null);
 
   const { loading, error, data } = useQuery<
     { routes: Route[] },
-    { keywords?: string }
-  >(ROUTES, { variables: { keywords } });
+    { keywords: string | null }
+  >(ROUTES, { variables: { keywords: keywords } });
 
   return (
     <Page title="Routes">
@@ -32,10 +32,8 @@ export const RoutesPage: React.FunctionComponent = () => {
         className="routes-search"
         minLength={2}
         debounceTimeout={300}
-        value={keywords}
-        onChange={(event) =>
-          setKeywords(event.target.value.trim() || undefined)
-        }
+        value={keywords ?? undefined}
+        onChange={(event) => setKeywords(event.target.value.trim() || null)}
       />
 
       {loading && <p>Loading...</p>}

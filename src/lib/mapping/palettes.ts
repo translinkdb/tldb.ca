@@ -38,3 +38,7 @@ export function getPaletteForRoute(route: Route): Palette {
 
   return ["#00355f"];
 }
+
+export function randomColor(palette: Palette): string {
+  return palette[Math.floor(Math.random() * palette.length)];
+}

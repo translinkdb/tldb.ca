@@ -9,6 +9,7 @@ import { RoutesPage } from "./pages/routes/RoutesPages";
 import mapboxgl from "mapbox-gl";
 import { config } from "./config";
 import { MapPage } from "./pages/map/MapPage";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 mapboxgl.accessToken = config.mapboxToken;
 

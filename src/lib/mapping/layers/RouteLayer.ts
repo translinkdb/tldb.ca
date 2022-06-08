@@ -1,15 +1,15 @@
 import { Route } from "../../expo/structures/Route";
 import { getPaletteColor, getPaletteForRoute, Palette } from "../palettes";
-import { BaseLayer } from "./BaseLayer";
+import { LineLayer } from "./base/LineLayer";
 import { PatternLayer } from "./PatternLayer";
 
-interface RouteLayerOptions {
+export interface RouteLayerOptions {
   source?: string;
   palette?: Palette;
   pattern?: string;
 }
 
-export class RouteLayer extends BaseLayer {
+export class RouteLayer extends LineLayer {
   constructor(route: Route, options: RouteLayerOptions = {}) {
     const patterns = options.pattern
       ? route.patterns.filter((p) => p.name === options.pattern)
@@ -17,10 +17,12 @@ export class RouteLayer extends BaseLayer {
 
     super(
       patterns.map((p, idx) => ({
-        ...PatternLayer.asOptions(
-          p,
-          getPaletteColor(options?.palette || getPaletteForRoute(route), idx)
-        ),
+        ...PatternLayer.asOptions(p, {
+          color: getPaletteColor(
+            options?.palette || getPaletteForRoute(route),
+            idx
+          ),
+        }),
       }))
     );
   }
