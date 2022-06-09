@@ -22,7 +22,7 @@ export const Navbar: React.FunctionComponent<NavbarProps> = () => {
           Routes
         </Link>
 
-        <Link to="/stops" className="navlink">
+        {/* <Link to="/stops" className="navlink">
           Stops
         </Link>
 
@@ -32,7 +32,7 @@ export const Navbar: React.FunctionComponent<NavbarProps> = () => {
 
         <Link to="/other" className="navlink">
           Other
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

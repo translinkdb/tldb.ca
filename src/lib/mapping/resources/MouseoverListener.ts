@@ -42,7 +42,6 @@ export class MouseoverListener {
       }
 
       await Promise.resolve(this.onMouseoutFunc?.(e));
-      console.log("Resetting state...");
 
       this.state.mousedOut = false;
       this.state = { ...this.options.initialState };

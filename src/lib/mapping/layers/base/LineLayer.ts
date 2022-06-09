@@ -31,6 +31,7 @@ export class LineLayer extends BaseLayer<LineLayerOptions> {
           options.visible === true || options.visible === undefined
             ? "visible"
             : "none",
+        "line-cap": "round",
       },
     };
   }

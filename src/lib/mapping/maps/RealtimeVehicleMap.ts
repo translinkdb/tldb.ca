@@ -81,8 +81,6 @@ export class RealtimeVehicleMap extends TLDBMap {
       const layer = this.base.getLayer(layerID);
 
       if (!layer) {
-        console.log(mouseoverListener.state);
-
         const pattern = await this.fetchTripPattern(
           vehiclePosition.trip.routePattern.patternID
         );
