@@ -3,6 +3,14 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import mapboxgl from "mapbox-gl";
+
+// mapbox-gl is broken for some reason </3
+// https://github.com/mapbox/mapbox-gl-js/issues/10173#issuecomment-750489778
+// @ts-ignore
+mapboxgl.workerClass =
+  // eslint-disable-next-line import/no-webpack-loader-syntax
+  require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default;
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
