@@ -1,5 +1,5 @@
 import { lineString } from "@turf/turf";
-import { Coordinates } from "../lib/expo/structures/Misc";
+import { Coordinates, CoordinatesArray } from "../lib/expo/structures/Misc";
 
 export function coordinatesToLinestring(coords: Coordinates[]) {
   return lineString(coords.map((c) => coordinatesToLatLongArray(c)));
@@ -10,30 +10,6 @@ export function coordinatesToLatLongArray(
 ): [longitude: number, latitude: number] {
   return [coords.longitude, coords.latitude];
 }
-
-// function getMaxMinOfCoordinates(coordinatesList: Coordinates[]): {
-//   max: Coordinates;
-//   min: Coordinates;
-// } {
-//   let maxLat = -Infinity;
-//   let minLat = Infinity;
-//   let maxLong = -Infinity;
-//   let minLong = Infinity;
-
-//   for (const coordinates of coordinatesList) {
-//     const { latitude, longitude } = coordinates;
-
-//     if (latitude > maxLat) maxLat = latitude;
-//     if (latitude < minLat) minLat = latitude;
-//     if (longitude > maxLong) maxLong = longitude;
-//     if (longitude < minLong) minLong = longitude;
-//   }
-
-//   return {
-//     max: { longitude: maxLong, latitude: maxLat },
-//     min: { longitude: minLong, latitude: minLat },
-//   };
-// }
 
 export function getCenter(coordinatesList: Coordinates[]): Coordinates {
   let totalLongitude = 0;
@@ -50,9 +26,15 @@ export function getCenter(coordinatesList: Coordinates[]): Coordinates {
   };
 }
 
-export function getZoom(_coordinatesList: Coordinates[]): number {
-  // const { max, min } = getMaxMinOfCoordinates(coordinatesList);
+export function calculateCoordinatesForPopup(
+  eventLongitude: number,
+  featureCoordinates: CoordinatesArray
+): CoordinatesArray {
+  let coordinates = featureCoordinates.slice() as CoordinatesArray;
 
-  return 10;
-  // return 9 / ((max.latitude - min.latitude) / (max.longitude - min.longitude));
+  while (Math.abs(eventLongitude - coordinates[0]) > 180) {
+    coordinates[0] += eventLongitude > coordinates[0] ? 360 : -360;
+  }
+
+  return coordinates;
 }

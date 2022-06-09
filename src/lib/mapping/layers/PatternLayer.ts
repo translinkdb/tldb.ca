@@ -6,6 +6,7 @@ import { LineLayer, LineLayerOptions } from "./base/LineLayer";
 export interface PatternLayerOptions {
   color?: string;
   id?: string;
+  visible?: boolean;
 }
 
 export class PatternLayer extends LineLayer {
@@ -22,6 +23,7 @@ export class PatternLayer extends LineLayer {
       source: { type: "geojson", data: linestringFromPattern(pattern) } as any,
       thickness: 3,
       color: options?.color || "#e7e7e7",
+      visible: options.visible,
     };
   }
 }

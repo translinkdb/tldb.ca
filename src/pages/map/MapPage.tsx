@@ -3,7 +3,7 @@ import { Page } from "../../components/page/Page";
 import "./MapPage.scss";
 import { MapDisplay } from "../../components/mapping/TLDBMapDisplay";
 import { RealtimeVehicleMap } from "../../lib/mapping/maps/RealtimeVehicleMap";
-import { MapControls } from "./MapControls";
+import { MapControls } from "../../components/mapping/MapControls";
 
 export const MapPage: React.FunctionComponent = () => {
   const map = useRef<RealtimeVehicleMap | null>(null);

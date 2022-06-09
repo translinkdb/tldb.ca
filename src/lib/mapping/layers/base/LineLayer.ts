@@ -6,6 +6,7 @@ export type LineLayerOptions = BaseLayerOptions<"line"> & {
   // Aesthetics
   color?: string;
   thickness?: number;
+  visible?: boolean;
 };
 
 export class LineLayer extends BaseLayer<LineLayerOptions> {
@@ -26,7 +27,10 @@ export class LineLayer extends BaseLayer<LineLayerOptions> {
         "line-color": options.color,
       },
       layout: {
-        visibility: "visible",
+        visibility:
+          options.visible === true || options.visible === undefined
+            ? "visible"
+            : "none",
       },
     };
   }

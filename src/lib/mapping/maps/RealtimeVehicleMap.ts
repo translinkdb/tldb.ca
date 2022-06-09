@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Popup } from "mapbox-gl";
 import { MutableRefObject } from "react";
+import { calculateCoordinatesForPopup } from "../../../helpers/map";
 import { expoClient } from "../../expo/client";
 import { Pattern } from "../../expo/structures/Route";
 import { Trip } from "../../expo/structures/Trip";
@@ -8,6 +8,8 @@ import { PatternLayer } from "../layers/PatternLayer";
 import { RealtimeVehicleLayer } from "../layers/RealtimeVehicleLayer";
 import { TLDBMap } from "../Map";
 import { rainbowPalette, randomColor } from "../palettes";
+import { MouseoverListener } from "../resources/MouseoverListener";
+import { Popup } from "../resources/Popup";
 import { RealtimeVehicleSource } from "../sources/RealtimeVehicleSource";
 
 export class RealtimeVehicleMap extends TLDBMap {
@@ -27,46 +29,50 @@ export class RealtimeVehicleMap extends TLDBMap {
   public apply(container: MutableRefObject<HTMLDivElement | null>): void {
     super.apply(container);
 
-    const popup = new Popup({
-      closeButton: false,
-      closeOnClick: false,
+    const popup = new Popup();
+    const mouseoverListener = new MouseoverListener({
+      layer: "tldb-gtfs-realtime",
+      pointerCursor: true,
+      initialState: { mousedOut: false },
     });
 
-    let vehicleID: undefined | number = undefined;
+    mouseoverListener.onMouseover(async (e) => {
+      const feature = e.features?.[0];
 
-    this.base.on("mouseenter", "tldb-gtfs-realtime", async (e) => {
-      this.base.getCanvas().style.cursor = "pointer";
+      if (feature) {
+        const vehicleID = feature.properties?.id;
+        const description = feature.properties?.description;
 
-      if (e.features) {
-        vehicleID = e.features[0].properties?.id;
-        await this.showPattern(vehicleID!);
+        mouseoverListener.state.vehicleID = vehicleID;
+        await this.showPattern(mouseoverListener);
 
-        const coordinates = (e.features[0].geometry as any).coordinates.slice();
-        const description = e.features[0].properties?.description;
-
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
-
-        popup.setLngLat(coordinates).setHTML(description).addTo(this.base);
+        popup.apply(this.base, {
+          at: calculateCoordinatesForPopup(
+            e.lngLat.lng,
+            feature.geometry.coordinates
+          ),
+          content: description,
+        });
       }
     });
 
-    this.base.on("mouseout", "tldb-gtfs-realtime", (e) => {
-      this.base.getCanvas().style.cursor = "";
-      popup.remove();
+    mouseoverListener.onMouseout(() => {
+      mouseoverListener.state.mousedOut = true;
 
-      this.hidePattern(vehicleID!);
+      this.hidePattern(mouseoverListener.state.vehicleID);
+      popup.remove();
     });
+
+    mouseoverListener.apply(this.base);
   }
 
   private realtimeVehicleSource(): RealtimeVehicleSource {
     return this.getSource("gtfs-realtime")! as RealtimeVehicleSource;
   }
 
-  private async showPattern(vehicleID: number) {
+  private async showPattern(mouseoverListener: MouseoverListener) {
     const vehiclePosition = this.realtimeVehicleSource().data.find(
-      (vp) => vp.vehicleID === vehicleID
+      (vp) => vp.vehicleID === mouseoverListener.state.vehicleID
     );
 
     if (vehiclePosition) {
@@ -75,6 +81,8 @@ export class RealtimeVehicleMap extends TLDBMap {
       const layer = this.base.getLayer(layerID);
 
       if (!layer) {
+        console.log(mouseoverListener.state);
+
         const pattern = await this.fetchTripPattern(
           vehiclePosition.trip.routePattern.patternID
         );
@@ -83,6 +91,7 @@ export class RealtimeVehicleMap extends TLDBMap {
           new PatternLayer(pattern, {
             color: randomColor(rainbowPalette),
             id: this.getLayerIDFromTrip(vehiclePosition.trip),
+            visible: !mouseoverListener.state.mousedOut,
           })
         );
       } else {
@@ -99,7 +108,13 @@ export class RealtimeVehicleMap extends TLDBMap {
     if (vehiclePosition) {
       const layerID = this.getLayerIDFromTrip(vehiclePosition.trip, true);
 
-      this.setLayerVisibility(layerID, false);
+      // Set a slight delay to catch cases where the
+      // mouseout event triggers immediately after the mouse over event,
+      setTimeout(() => {
+        if (this.base.getLayer(layerID)) {
+          this.setLayerVisibility(layerID, false);
+        }
+      }, 50);
     }
   }
 
